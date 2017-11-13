@@ -28,9 +28,11 @@ def generate_ico(image, name):
     image.save('{0}.ico'.format(name), 'ICO')
 
 
-def generate_shortcut(name):
+def generate_shortcut(name, path=None):
+    if path is None:
+        path = '{0}.bat'.format(name)
     winshell.CreateShortcut(Path=os.path.join(os.path.abspath(os.curdir), '{0}.lnk'.format(name)),
-                            Target='{0}.bat'.format(name),
+                            Target= path,
                             Icon=(os.path.join(os.path.abspath(os.curdir), '{0}.ico'.format(name)), 0))
     winshell.move_file(source_path='{0}.lnk'.format(name),
                        target_path=os.path.join(winshell.programs(), '{0}.lnk'.format(name)))
@@ -60,9 +62,18 @@ def ask_user():
             website = input('What is the full URL?')
             if website != '':
                 break
+        os.mkdir(name)
+        os.chdir(name)
         generate_launcher(name, website)
-        generate_manifest(name, True, path, 'light', '#FFFFFF')
         generate_shortcut(name)
+    elif web == 'N':
+        file_path = askopenfilename()
+        # file_path = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+        os.mkdir(name)
+        os.chdir(name)
+        generate_shortcut(name, file_path)
+
+    generate_manifest(name, True, path, 'light', '#FFFFFF')
 
 
 ask_user()
