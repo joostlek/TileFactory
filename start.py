@@ -5,7 +5,7 @@ import os
 import winshell
 
 
-def generate_manifest(name, show_name, filename, textcolor='light', backgroundcolor='#FFFFFF'):
+def generate_manifest(name, show_name, filename, text_color='light', background_color='#FFFFFF'):
     sizes = [(150, 150), (70, 70), (44, 44)]
     file = open('{0}.VisualElementsManifest.xml'.format(name), 'w')
     if show_name:
@@ -20,7 +20,7 @@ def generate_manifest(name, show_name, filename, textcolor='light', backgroundco
     file.write("<Application xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>\n    <VisualElements\n        "
                "ShowNameOnSquare150x150Logo='{0}'\n        Square150x150Logo='{1}.150.png'\n        "
                "Square70x70Logo='{1}.70.png'\n        Square44x44Logo='{1}.44.png'\n        ForegroundText='{2}'\n    "
-               "    BackgroundColor='{3}'/>\n</Application>".format(show_name, name, textcolor, backgroundcolor))
+               "    BackgroundColor='{3}'/>\n</Application>".format(show_name, name, text_color, background_color))
     file.close()
 
 
@@ -29,8 +29,11 @@ def generate_ico(image, name):
 
 
 def generate_shortcut(name):
-    winshell.CreateShortcut(os.path.join(os.path.abspath(os.curdir), '{0}.lnk'.format(name)), Target='{0}.bat'.format(name), Icon=(os.path.join(os.path.abspath(os.curdir), '{0}.ico'.format(name)), 0))
-    winshell.move_file('{0}.lnk'.format(name), os.path.join(winshell.start_menu(), '{0}.lnk'.format(name)))
+    winshell.CreateShortcut(Path=os.path.join(os.path.abspath(os.curdir), '{0}.lnk'.format(name)),
+                            Target='{0}.bat'.format(name),
+                            Icon=(os.path.join(os.path.abspath(os.curdir), '{0}.ico'.format(name)), 0))
+    winshell.move_file(source_path='{0}.lnk'.format(name),
+                       target_path=os.path.join(winshell.programs(), '{0}.lnk'.format(name)))
 
 
 def generate_launcher(name, url):
@@ -49,7 +52,7 @@ def ask_user():
     # path = 'D:/Tiles/Tiles/google contacts/Google Contacts.png'
     print(path)
     while True:
-        web = input('Is this a webpage?')
+        web = input('Is this a website?')
         if web == 'Y' or web == 'N':
             break
     if web == 'Y':
