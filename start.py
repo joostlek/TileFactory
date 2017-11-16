@@ -1,8 +1,34 @@
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+from layout import Ui_MainWindow
 from PIL import Image
 import os
 import winshell
+import sys
+
+
+class App(Ui_MainWindow):
+    def __init__(self, main_window):
+        Ui_MainWindow.__init__(self)
+        self.setupUi(main_window)
+
+        self.button_submit.clicked.connect(self.on_submit)
+        self.button_search_tile.clicked.connect(self.on_file)
+
+    def on_submit(self):
+        os.mkdir(self.text_name.text())
+        os.chdir(self.text_name.text())
+        generate_launcher(self.text_name.text(), self.text_url.text())
+        generate_shortcut(self.text_name.text())
+        generate_manifest(self.text_name.text(), self.text_name.text(), self.text_path.text())
+
+    def on_file(self):
+        file_dialog = QFileDialog()
+        options = file_dialog.Options()
+        options |= file_dialog.DontUseNativeDialog
+        fname = file_dialog.getOpenFileName(file_dialog, 'Open file',
+                                            'c:\\', "Image files (*.jpg *.gif)")
+        if fname:
+            self.text_path.setText(fname[0])
 
 
 def generate_manifest(name, show_name, filename, text_color='light', background_color='#FFFFFF'):
@@ -32,7 +58,7 @@ def generate_shortcut(name, path=None):
     if path is None:
         path = '{0}.bat'.format(name)
     winshell.CreateShortcut(Path=os.path.join(os.path.abspath(os.curdir), '{0}.lnk'.format(name)),
-                            Target= path,
+                            Target=path,
                             Icon=(os.path.join(os.path.abspath(os.curdir), '{0}.ico'.format(name)), 0))
     winshell.move_file(source_path='{0}.lnk'.format(name),
                        target_path=os.path.join(winshell.programs(), '{0}.lnk'.format(name)))
@@ -44,36 +70,9 @@ def generate_launcher(name, url):
     file.close()
 
 
-def ask_user():
-    while True:
-        name = input('What is the name of the service/program you are trying to add?')
-        if name != '':
-            break
-    Tk().withdraw()
-    path = askopenfilename()
-    # path = 'D:/Tiles/Tiles/google contacts/Google Contacts.png'
-    print(path)
-    while True:
-        web = input('Is this a website?')
-        if web == 'Y' or web == 'N':
-            break
-    if web == 'Y':
-        while True:
-            website = input('What is the full URL?')
-            if website != '':
-                break
-        os.mkdir(name)
-        os.chdir(name)
-        generate_launcher(name, website)
-        generate_shortcut(name)
-    elif web == 'N':
-        file_path = askopenfilename()
-        # file_path = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-        os.mkdir(name)
-        os.chdir(name)
-        generate_shortcut(name, file_path)
-
-    generate_manifest(name, True, path, 'light', '#FFFFFF')
-
-
-ask_user()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = QMainWindow()
+    ui = App(main_window)
+    main_window.show()
+    sys.exit(app.exec_())
